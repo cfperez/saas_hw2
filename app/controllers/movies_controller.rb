@@ -14,14 +14,14 @@ class MoviesController < ApplicationController
       sort_by = params[:sort_by]
 
       if @@SORT_BY.include? sort_by.to_sym
-        @movies = Movie.all.sort {|a,b| a.send(sort_by) <=> b.send(sort_by)}
-        flash.delete :notice
+        @movies = Movie.all(:order => sort_by)
+        eval("@hilite_#{sort_by} = 'hilite'")
         return
       else
         flash[:notice] = "Can't sort movies by parameter #{sort_by}." 
       end
     end
-    @movies = Movie.all.sort
+    @movies = Movie.all
   end
 
   def new
