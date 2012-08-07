@@ -12,18 +12,27 @@ class MoviesController < ApplicationController
     flash.delete :notice
     @all_ratings = Movie.ratings
 
-    if params.include? :sort_by
-      sort_by = params[:sort_by]
 
-      if @@SORT_BY.include? sort_by.to_sym
-        @movies = Movie.all(:order => sort_by)
-        eval("@hilite_#{sort_by} = 'hilite'")
-        return
+    if params.include? :sort_by
+      @sort_by = params[:sort_by]
+
+      if @@SORT_BY.include? @sort_by.to_sym
+        @movies = Movie.order @sort_by
+        eval("@hilite_#{@sort_by} = 'hilite'")
       else
-        flash[:notice] = "Can't sort movies by parameter #{sort_by}." 
+        flash[:notice] = "Can't sort movies by parameter \"#{@sort_by}\"." 
+        @movies = Movie
       end
     end
-    @movies = Movie.all
+
+    if params.include? :ratings
+      @filters = params[:ratings].keys
+      @movies = @movies.where(:rating => @filters)
+    else
+      @filters = []
+      @movies = []
+    end
+
   end
 
   def new
