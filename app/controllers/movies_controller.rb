@@ -10,6 +10,8 @@ class MoviesController < ApplicationController
 
   def index
     flash.delete :notice
+    @all_ratings = Movie.ratings
+
     if params.include? :sort_by
       sort_by = params[:sort_by]
 
