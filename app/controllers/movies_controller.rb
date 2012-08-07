@@ -9,20 +9,31 @@ class MoviesController < ApplicationController
   end
 
   def index
-    flash.delete :notice
     @all_ratings = Movie.ratings
 
+    @movies=Movie
+
+    if not params.key?(:commit) and not params.key?(:sort_by) and not params.key?(:ratings) and session[:movies_query]
+      saved=session[:movies_query]
+      flash.keep
+      session.delete :movies_query
+      redirect_to movies_path(saved)
+    else
+      session[:movies_query] = request.query_parameters
+    end
 
     if params.include? :sort_by
       @sort_by = params[:sort_by]
 
       if @@SORT_BY.include? @sort_by.to_sym
-        @movies = Movie.order @sort_by
+        @movies = @movies.order @sort_by
         eval("@hilite_#{@sort_by} = 'hilite'")
+        flash.delete :notice
       else
         flash[:notice] = "Can't sort movies by parameter \"#{@sort_by}\"." 
-        @movies = Movie
       end
+    else
+      @sort_by = false
     end
 
     if params.include? :ratings
